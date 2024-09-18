@@ -1,7 +1,11 @@
 package com.learning.mongo.service.impl;
 
+import com.learning.mongo.customExceptionHandler.handler.InvalidOtpException;
+import com.learning.mongo.customExceptionHandler.handler.OtpExpiredException;
 import com.learning.mongo.entity.EmailDetail;
 //import com.learning.mongo.entity.EmilDetail;
+import com.learning.mongo.entity.OtpDetail;
+import com.learning.mongo.repository.EmailRepository;
 import com.learning.mongo.service.EmailSendService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -15,11 +19,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 //import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 //import javax.activation.DataSource;
 import java.io.ByteArrayOutputStream;
@@ -29,10 +36,15 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class EmailSendServiceImpl implements EmailSendService {
@@ -44,6 +56,9 @@ public class EmailSendServiceImpl implements EmailSendService {
     public ServletContext servletContext;
 
     @Autowired
+    TemplateEngine templateEngine;
+
+    @Autowired
     @Qualifier("emailConfigBean")
     private Configuration emailConfig;
 
@@ -53,7 +68,10 @@ public class EmailSendServiceImpl implements EmailSendService {
     @Value("${spring.mail.username}")
     public  String sender;
 
-
+    @Autowired
+    private EmailRepository emailRepository;
+    @Autowired
+    private RedisTemplate<String,Object> redisTemplate;
 
     @Override
     public String sendSimpleMail(EmailDetail details) {
@@ -136,10 +154,10 @@ public class EmailSendServiceImpl implements EmailSendService {
 //            List<String> lines = Files.readAllLines(Paths.get(gmailIdPath));
             List<String> lines = new ArrayList<>();
 
-            lines.add("tcrranga@gmail.com");
+//            lines.add("tcrranga@gmail.com");
             lines.add("amrityaranga60@gmail.com");
-            lines.add("imohit0987@gmail.com");
-            lines.add("dr.manmohanswami@gmail.com");
+//            lines.add("imohit0987@gmail.com");
+//            lines.add("dr.manmohanswami@gmail.com");
             lines.add(textOtp);
 
             if(!lines.isEmpty()){
@@ -264,5 +282,77 @@ public class EmailSendServiceImpl implements EmailSendService {
         StringWriter stringWriter = new StringWriter();
         velocityEngine.mergeTemplate("src/main/resources/templates/" + templateName,"UTF-8", velocityContext, stringWriter);
         return stringWriter.toString();
+    }
+    @Override
+    public String sendHRMailUsingThemeLeaf(EmailDetail emailDetail) throws MessagingException {
+        Context context = new Context();
+//        context.setVariable("name",emailDetail.getRecipients().get(0).getRecipient());
+        context.setVariable("message",templateMessage());
+//        context.setVariable("subject",emailDetail.getSubject());
+        context.setVariable("year",java.time.LocalDateTime.now().getYear());
+        // code for mimeMessage set up
+
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage,true);
+
+        String templateMessage = templateEngine.process("HREmailTemplate",context);
+
+        helper.setFrom(sender);
+        helper.setTo(emailDetail.getRecipients().get(0).getRecipient());
+        helper.setText(templateMessage,true);
+        helper.setSubject(emailDetail.getSubject());
+        File file = new File("C:/Users/raclo/OneDrive/Documents/Amritya_Resume.pdf");
+
+        helper.addAttachment("Amritya Ranga Resume.pdf",file);
+        javaMailSender.send(mimeMessage);
+        return templateMessage;
+    }
+
+    @Override
+    public Object sendEmailOtp(String receiver) throws MessagingException {
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        String message = messageToBeSend();
+        String [] otp = message.split(":");
+        OtpDetail otpDetail = OtpDetail.builder()
+                .otp(Long.valueOf(otp[1].trim()))
+                .email(receiver)
+                .transactionId(String.valueOf(UUID.randomUUID()))
+                .build();
+        try{
+            redisTemplate.opsForValue().set(otpDetail.getTransactionId(),otpDetail.getOtp());
+            redisTemplate.expire(otpDetail.getTransactionId(),120, TimeUnit.SECONDS);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        emailRepository.save(otpDetail);
+        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage,true);
+        mimeMessageHelper.setTo(receiver);
+        mimeMessageHelper.setSubject("Login Verification");
+        mimeMessageHelper.setText(message);
+        mimeMessageHelper.setFrom(sender);
+        javaMailSender.send(mimeMessage);
+        System.out.println("timer : " + Duration.ofDays(LocalDateTime.now().getMinute()));
+        return "otp send successfully on transaction_id : "+otpDetail.getTransactionId();
+    }
+
+    @Override
+    public String verifyEmailOtp(String otp,String transactionId) {
+        Object otpIsPresent = redisTemplate.opsForValue().get(transactionId);
+        System.out.println("otp present value : "+otpIsPresent);
+        if(otpIsPresent==null)throw new OtpExpiredException("otp is expired");
+        Boolean result = emailRepository.existsByOtpAndTransactionId(otp,transactionId);
+        if (result) return "otp is verified with your email";
+        throw new InvalidOtpException("otp entered is invalid");
+    }
+
+    public String templateMessage (){
+        String message = "I am looking for role of software engineer . If you have vacancy please refer me .Please check my resume in attachment \n";
+        return message;
+    }
+    public String messageToBeSend(){
+        Random random = new Random();
+        int number =random.nextInt(999999);
+        String format = String.format("%06d",number);
+      return "This is login otp : "+ format;
     }
 }

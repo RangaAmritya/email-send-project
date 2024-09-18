@@ -2,6 +2,7 @@ package com.learning.mongo.service;
 
 import com.learning.mongo.entity.EmailDetail;
 import jakarta.mail.MessagingException;
+import org.springframework.http.ResponseEntity;
 //import com.learning.mongo.entity.EmilDetail;
 
 public interface EmailSendService {
@@ -14,4 +15,10 @@ public interface EmailSendService {
     String sendTemMessage();
 
     String senHtmlTemplate() throws MessagingException;
+
+    String sendHRMailUsingThemeLeaf(EmailDetail emailDetail) throws MessagingException;
+
+    Object sendEmailOtp(String receiver) throws MessagingException;
+
+    String verifyEmailOtp(String otp,String transactionId);
 }
