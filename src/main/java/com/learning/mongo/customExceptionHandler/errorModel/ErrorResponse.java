@@ -1,10 +1,10 @@
-package com.learning.mongo.customExceptionHandler.errorReponse;
+package com.learning.mongo.customExceptionHandler.errorModel;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.util.*;
 
+import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,6 +12,6 @@ import java.util.*;
 public class ErrorResponse {
 
     private String errorMessage;
-    private String status ;
+    private String status;
     private Date time;
 }

@@ -1,24 +1,19 @@
 package com.learning.mongo.controller;
 
 import com.learning.mongo.entity.EmailDetail;
+//import com.learning.mongo.entity.EmilDetail;
 import com.learning.mongo.service.EmailSendService;
 import io.micrometer.core.annotation.Timed;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+//import org.springframework.test.annotation.Timed;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
-import java.io.IOException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 @RestController
 public class EmailSenderController {
@@ -62,16 +57,17 @@ public class EmailSenderController {
 
     @PostMapping("/sendHRMailThemeLeaf")
     public ResponseEntity<?> sendHRMailUsingThemeLeaf(@RequestBody EmailDetail emailDetail) throws MessagingException {
-        String status = emailService.sendHRMailUsingThemeLeaf(emailDetail);
-        return new ResponseEntity<>(status,HttpStatus.OK);
-    }
+                String status = emailService.sendHRMailUsingThemeLeaf(emailDetail);
+                return new ResponseEntity<>(status,HttpStatus.OK);
+            }
     @Timed(value = "my_custom_metric", description = "Time taken for my custom API")
     @PostMapping("/sendEmailOtp")
     public ResponseEntity<?> sendEmailOtp(@RequestParam String receiver) throws MessagingException {
-        return ResponseEntity.ok(emailService.sendEmailOtp(receiver));
-    }
+                return ResponseEntity.ok(emailService.sendEmailOtp(receiver));
+            }
     @PostMapping("/verifyEmailOtp")
     public ResponseEntity<?> verifyEmailOtp(@RequestParam String otp,@RequestParam String transactionId){
-        return ResponseEntity.ok(emailService.verifyEmailOtp(otp,transactionId));
-    }
+                return ResponseEntity.ok(emailService.verifyEmailOtp(otp,transactionId));
+            }
+
 }

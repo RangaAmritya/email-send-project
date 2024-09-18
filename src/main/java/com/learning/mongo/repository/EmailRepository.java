@@ -6,7 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EmailRepository extends JpaRepository<OtpDetail,Long> {
-
-
     boolean existsByOtpAndTransactionId(String otp, String transaction_id);
 }

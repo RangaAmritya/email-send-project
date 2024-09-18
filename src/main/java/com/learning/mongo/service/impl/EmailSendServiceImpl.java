@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-
 //import javax.activation.DataSource;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -56,9 +55,6 @@ public class EmailSendServiceImpl implements EmailSendService {
     public ServletContext servletContext;
 
     @Autowired
-    TemplateEngine templateEngine;
-
-    @Autowired
     @Qualifier("emailConfigBean")
     private Configuration emailConfig;
 
@@ -69,9 +65,11 @@ public class EmailSendServiceImpl implements EmailSendService {
     public  String sender;
 
     @Autowired
+    private RedisTemplate<String,Object> redisTemplate;
+    @Autowired
     private EmailRepository emailRepository;
     @Autowired
-    private RedisTemplate<String,Object> redisTemplate;
+    private TemplateEngine templateEngine;
 
     @Override
     public String sendSimpleMail(EmailDetail details) {
@@ -154,10 +152,10 @@ public class EmailSendServiceImpl implements EmailSendService {
 //            List<String> lines = Files.readAllLines(Paths.get(gmailIdPath));
             List<String> lines = new ArrayList<>();
 
-//            lines.add("tcrranga@gmail.com");
+            lines.add("tcrranga@gmail.com");
             lines.add("amrityaranga60@gmail.com");
-//            lines.add("imohit0987@gmail.com");
-//            lines.add("dr.manmohanswami@gmail.com");
+            lines.add("imohit0987@gmail.com");
+            lines.add("dr.manmohanswami@gmail.com");
             lines.add(textOtp);
 
             if(!lines.isEmpty()){
@@ -283,76 +281,77 @@ public class EmailSendServiceImpl implements EmailSendService {
         velocityEngine.mergeTemplate("src/main/resources/templates/" + templateName,"UTF-8", velocityContext, stringWriter);
         return stringWriter.toString();
     }
-    @Override
-    public String sendHRMailUsingThemeLeaf(EmailDetail emailDetail) throws MessagingException {
-        Context context = new Context();
-//        context.setVariable("name",emailDetail.getRecipients().get(0).getRecipient());
-        context.setVariable("message",templateMessage());
-//        context.setVariable("subject",emailDetail.getSubject());
-        context.setVariable("year",java.time.LocalDateTime.now().getYear());
-        // code for mimeMessage set up
-
-        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage,true);
-
-        String templateMessage = templateEngine.process("HREmailTemplate",context);
-
-        helper.setFrom(sender);
-        helper.setTo(emailDetail.getRecipients().get(0).getRecipient());
-        helper.setText(templateMessage,true);
-        helper.setSubject(emailDetail.getSubject());
-        File file = new File("C:/Users/raclo/OneDrive/Documents/Amritya_Resume.pdf");
-
-        helper.addAttachment("Amritya Ranga Resume.pdf",file);
-        javaMailSender.send(mimeMessage);
-        return templateMessage;
-    }
 
     @Override
     public Object sendEmailOtp(String receiver) throws MessagingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         String message = messageToBeSend();
-        String [] otp = message.split(":");
+        String[] otp = message.split(":");
         OtpDetail otpDetail = OtpDetail.builder()
                 .otp(Long.valueOf(otp[1].trim()))
                 .email(receiver)
                 .transactionId(String.valueOf(UUID.randomUUID()))
                 .build();
-        try{
-            redisTemplate.opsForValue().set(otpDetail.getTransactionId(),otpDetail.getOtp());
-            redisTemplate.expire(otpDetail.getTransactionId(),120, TimeUnit.SECONDS);
-        }catch (Exception e){
+        try {
+            redisTemplate.opsForValue().set(otpDetail.getTransactionId(), otpDetail.getOtp());
+            redisTemplate.expire(otpDetail.getTransactionId(), 120, TimeUnit.SECONDS);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         emailRepository.save(otpDetail);
-        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage,true);
+        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
         mimeMessageHelper.setTo(receiver);
         mimeMessageHelper.setSubject("Login Verification");
         mimeMessageHelper.setText(message);
         mimeMessageHelper.setFrom(sender);
         javaMailSender.send(mimeMessage);
         System.out.println("timer : " + Duration.ofDays(LocalDateTime.now().getMinute()));
-        return "otp send successfully on transaction_id : "+otpDetail.getTransactionId();
+        return "otp send successfully on transaction_id : " + otpDetail.getTransactionId();
     }
 
     @Override
-    public String verifyEmailOtp(String otp,String transactionId) {
+    public String verifyEmailOtp(String otp, String transactionId) {
         Object otpIsPresent = redisTemplate.opsForValue().get(transactionId);
-        System.out.println("otp present value : "+otpIsPresent);
-        if(otpIsPresent==null)throw new OtpExpiredException("otp is expired");
-        Boolean result = emailRepository.existsByOtpAndTransactionId(otp,transactionId);
+        System.out.println("otp present value : " + otpIsPresent);
+        if (otpIsPresent == null) throw new OtpExpiredException("otp is expired");
+        Boolean result = emailRepository.existsByOtpAndTransactionId(otp, transactionId);
         if (result) return "otp is verified with your email";
         throw new InvalidOtpException("otp entered is invalid");
     }
 
-    public String templateMessage (){
+    public String templateMessage() {
         String message = "I am looking for role of software engineer . If you have vacancy please refer me .Please check my resume in attachment \n";
         return message;
     }
-    public String messageToBeSend(){
+
+    public String messageToBeSend() {
         Random random = new Random();
-        int number =random.nextInt(999999);
-        String format = String.format("%06d",number);
-      return "This is login otp : "+ format;
+        int number = random.nextInt(999999);
+        String format = String.format("%06d", number);
+        return "This is login otp : " + format;
     }
+    @Override
+    public String sendHRMailUsingThemeLeaf(EmailDetail emailDetail) throws MessagingException {
+               Context context = new Context();
+                context.setVariable("name",emailDetail.getRecipients().get(0).getRecipient());
+                       context.setVariable("message",templateMessage());
+                context.setVariable("subject",emailDetail.getSubject());
+                        context.setVariable("year",java.time.LocalDateTime.now().getYear());
+                // code for mimeMessage set up
+
+                                MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage,true);
+
+                        String templateMessage = templateEngine.process("HREmailTemplate",context);
+
+                        helper.setFrom(sender);
+                helper.setTo(emailDetail.getRecipients().get(0).getRecipient());
+                helper.setText(templateMessage,true);
+                helper.setSubject(emailDetail.getSubject());
+                File file = new File("C:/Users/raclo/OneDrive/Documents/Amritya_Resume.pdf");
+
+                        helper.addAttachment("Amritya Ranga Resume.pdf",file);
+                javaMailSender.send(mimeMessage);
+                return templateMessage;
+            }
 }
