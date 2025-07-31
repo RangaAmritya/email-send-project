@@ -4,8 +4,8 @@ import com.learning.mongo.customExceptionHandler.handler.InvalidOtpException;
 import com.learning.mongo.customExceptionHandler.handler.OtpExpiredException;
 import com.learning.mongo.entity.EmailDetail;
 //import com.learning.mongo.entity.EmilDetail;
-import com.learning.mongo.entity.OtpDetail;
-import com.learning.mongo.repository.EmailRepository;
+//import com.learning.mongo.entity.OtpDetail;
+//import com.learning.mongo.repository.EmailRepository;
 import com.learning.mongo.service.EmailSendService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 //import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.data.redis.core.RedisTemplate;
+//import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -64,84 +64,87 @@ public class EmailSendServiceImpl implements EmailSendService {
     @Value("${spring.mail.username}")
     public  String sender;
 
-    @Autowired
-    private RedisTemplate<String,Object> redisTemplate;
-    @Autowired
-    private EmailRepository emailRepository;
+//    @Autowired
+//    private RedisTemplate<String,Object> redisTemplate;
+//    @Autowired
+//    private EmailRepository emailRepository;
     @Autowired
     private TemplateEngine templateEngine;
 
-    @Override
-    public String sendSimpleMail(EmailDetail details) {
+//    @Override
+//    public String sendSimpleMail(EmailDetail details) {
+//
+//        // Try block to check for exceptions
+//
+//
+//        try {
+//
+//            // Creating a simple mail message
+//            SimpleMailMessage mailMessage
+//                    = new SimpleMailMessage();
+//
+//            // Setting up necessary details
+//            mailMessage.setFrom(sender);
+//            mailMessage.setTo(details.getRecipients().get(0).getRecipient());
+//            mailMessage.setText(details.getMessage());
+//            mailMessage.setSubject(details.getSubject());
+//
+//            // Sending the mail
+//            javaMailSender.send(mailMessage);
+//            return "Mail Sent Successfully...";
+//        }
+//
+//        // Catch block to handle the exceptions
+//        catch (Exception e) {
+//            return "Error while Sending Mail";
+//        }
+//    }
 
-        // Try block to check for exceptions
-
-
-        try {
-
-            // Creating a simple mail message
-            SimpleMailMessage mailMessage
-                    = new SimpleMailMessage();
-
-            // Setting up necessary details
-            mailMessage.setFrom(sender);
-            mailMessage.setTo(details.getRecipients().get(0).getRecipient());
-            mailMessage.setText(details.getMessage());
-            mailMessage.setSubject(details.getSubject());
-
-            // Sending the mail
-            javaMailSender.send(mailMessage);
-            return "Mail Sent Successfully...";
-        }
-
-        // Catch block to handle the exceptions
-        catch (Exception e) {
-            return "Error while Sending Mail";
-        }
-    }
-
-    @Override
-    public String senMailWithAttachment(EmailDetail details) {
-
-
-        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-
-        try {
-
-
-            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-
-            mimeMessageHelper.setFrom(sender);
-            mimeMessageHelper.setTo(details.getRecipients().get(0).getRecipient());
-            mimeMessageHelper.setSubject(details.getSubject());
-            mimeMessageHelper.setText(details.getMessage());
-            mimeMessageHelper.setCc("amrityaranga60@gmail.com");
-            File file1 =
-                    new File
-                            ("C:\\Users\\raclo\\Downloads" +
-                                    "\\mongo\\CertificateNew_page-0001.pdf");
-            byte[] bytes = convertDocToByteArray(file1.getPath());
-
-            ByteArrayDataSource attachMent = new ByteArrayDataSource(bytes,"application/octet-stream");
-
-//            String stream = Base64.getEncoder().encodeToString(bytes);
-//            byte[] newBytes = Base64.getDecoder().decode(stream);
-//            convertByteArrayToDoc(file1.getPath(), newBytes);
-
-//            mimeMessageHelper.addAttachment(file.getFilename(), file);
-            mimeMessageHelper.addAttachment("certificate.pdf", attachMent);
-
-            javaMailSender.send(mimeMessage);
-
-            return "Message Sent SuccessFully On " + details.getRecipients().get(0).getRecipient() +
-                    "Please check Message";
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Error While Sending Message With Attachment";
-        }
-
-    }
+//    @Override
+//    public String senMailWithAttachment(EmailDetail details) {
+//
+//
+//        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+//
+//        try {
+//
+//
+//            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+//
+//            mimeMessageHelper.setFrom(sender);
+//            mimeMessageHelper.setTo(details.getRecipients().get(0).getRecipient());
+//            mimeMessageHelper.setSubject(details.getSubject());
+//            mimeMessageHelper.setText(details.getMessage());
+//            mimeMessageHelper.setCc("amrityaranga60@gmail.com");
+//            File file1 =
+//                    new File
+//                            ("C:\\Users\\raclo\\Downloads" +
+//                                    "\\mongo\\CertificateNew_page-0001.pdf");
+//            byte[] bytes = convertDocToByteArray(file1.getPath());@Getter
+//@Setter
+//@AllArgsConstructor
+//@NoArgsConstructor
+//
+//            ByteArrayDataSource attachMent = new ByteArrayDataSource(bytes,"application/octet-stream");
+//
+////            String stream = Base64.getEncoder().encodeToString(bytes);
+////            byte[] newBytes = Base64.getDecoder().decode(stream);
+////            convertByteArrayToDoc(file1.getPath(), newBytes);
+//
+////            mimeMessageHelper.addAttachment(file.getFilename(), file);
+//            mimeMessageHelper.addAttachment("certificate.pdf", attachMent);
+//
+//            javaMailSender.send(mimeMessage);
+//
+//            return "Message Sent SuccessFully On " + details.getRecipients().get(0).getRecipient() +
+//                    "Please check Message";
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return "Error While Sending Message With Attachment";
+//        }
+//
+//    }
 
     @Override
     public String sendOtpToMail(String textOtp) {
@@ -282,42 +285,42 @@ public class EmailSendServiceImpl implements EmailSendService {
         return stringWriter.toString();
     }
 
-    @Override
-    public Object sendEmailOtp(String receiver) throws MessagingException {
-        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-        String message = messageToBeSend();
-        String[] otp = message.split(":");
-        OtpDetail otpDetail = OtpDetail.builder()
-                .otp(Long.valueOf(otp[1].trim()))
-                .email(receiver)
-                .transactionId(String.valueOf(UUID.randomUUID()))
-                .build();
-        try {
-            redisTemplate.opsForValue().set(otpDetail.getTransactionId(), otpDetail.getOtp());
-            redisTemplate.expire(otpDetail.getTransactionId(), 120, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        emailRepository.save(otpDetail);
-        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-        mimeMessageHelper.setTo(receiver);
-        mimeMessageHelper.setSubject("Login Verification");
-        mimeMessageHelper.setText(message);
-        mimeMessageHelper.setFrom(sender);
-        javaMailSender.send(mimeMessage);
-        System.out.println("timer : " + Duration.ofDays(LocalDateTime.now().getMinute()));
-        return "otp send successfully on transaction_id : " + otpDetail.getTransactionId();
-    }
+//    @Override
+//    public Object sendEmailOtp(String receiver) throws MessagingException {
+//        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+//        String message = messageToBeSend();
+//        String[] otp = message.split(":");
+//        OtpDetail otpDetail = OtpDetail.builder()
+//                .otp(Long.valueOf(otp[1].trim()))
+//                .email(receiver)
+//                .transactionId(String.valueOf(UUID.randomUUID()))
+//                .build();
+//        try {
+//            redisTemplate.opsForValue().set(otpDetail.getTransactionId(), otpDetail.getOtp());
+//            redisTemplate.expire(otpDetail.getTransactionId(), 120, TimeUnit.SECONDS);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        emailRepository.save(otpDetail);
+//        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+//        mimeMessageHelper.setTo(receiver);
+//        mimeMessageHelper.setSubject("Login Verification");
+//        mimeMessageHelper.setText(message);
+//        mimeMessageHelper.setFrom(sender);
+//        javaMailSender.send(mimeMessage);
+//        System.out.println("timer : " + Duration.ofDays(LocalDateTime.now().getMinute()));
+//        return "otp send successfully on transaction_id : " + otpDetail.getTransactionId();
+//    }
 
-    @Override
-    public String verifyEmailOtp(String otp, String transactionId) {
-        Object otpIsPresent = redisTemplate.opsForValue().get(transactionId);
-        System.out.println("otp present value : " + otpIsPresent);
-        if (otpIsPresent == null) throw new OtpExpiredException("otp is expired");
-        Boolean result = emailRepository.existsByOtpAndTransactionId(otp, transactionId);
-        if (result) return "otp is verified with your email";
-        throw new InvalidOtpException("otp entered is invalid");
-    }
+//    @Override
+//    public String verifyEmailOtp(String otp, String transactionId) {
+//        Object otpIsPresent = redisTemplate.opsForValue().get(transactionId);
+//        System.out.println("otp present value : " + otpIsPresent);
+//        if (otpIsPresent == null) throw new OtpExpiredException("otp is expired");
+//        Boolean result = emailRepository.existsByOtpAndTransactionId(otp, transactionId);
+//        if (result) return "otp is verified with your email";
+//        throw new InvalidOtpException("otp entered is invalid");
+//    }
 
     public String templateMessage() {
         String message = "I am looking for role of software engineer . If you have vacancy please refer me .Please check my resume in attachment \n";
@@ -330,28 +333,28 @@ public class EmailSendServiceImpl implements EmailSendService {
         String format = String.format("%06d", number);
         return "This is login otp : " + format;
     }
-    @Override
-    public String sendHRMailUsingThemeLeaf(EmailDetail emailDetail) throws MessagingException {
-               Context context = new Context();
-                context.setVariable("name",emailDetail.getRecipients().get(0).getRecipient());
-                       context.setVariable("message",templateMessage());
-                context.setVariable("subject",emailDetail.getSubject());
-                        context.setVariable("year",java.time.LocalDateTime.now().getYear());
-                // code for mimeMessage set up
-
-                                MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage,true);
-
-                        String templateMessage = templateEngine.process("HREmailTemplate",context);
-
-                        helper.setFrom(sender);
-                helper.setTo(emailDetail.getRecipients().get(0).getRecipient());
-                helper.setText(templateMessage,true);
-                helper.setSubject(emailDetail.getSubject());
-                File file = new File("C:/Users/raclo/OneDrive/Documents/Amritya_Resume.pdf");
-
-                        helper.addAttachment("Amritya Ranga Resume.pdf",file);
-                javaMailSender.send(mimeMessage);
-                return templateMessage;
-            }
+//    @Override
+//    public String sendHRMailUsingThemeLeaf(EmailDetail emailDetail) throws MessagingException {
+//               Context context = new Context();
+//                context.setVariable("name",emailDetail.getRecipients().get(0).getRecipient());
+//                       context.setVariable("message",templateMessage());
+//                context.setVariable("subject",emailDetail.getSubject());
+//                        context.setVariable("year",java.time.LocalDateTime.now().getYear());
+//                // code for mimeMessage set up
+//
+//                                MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+//                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage,true);
+//
+//                        String templateMessage = templateEngine.process("HREmailTemplate",context);
+//
+//                        helper.setFrom(sender);
+//                helper.setTo(emailDetail.getRecipients().get(0).getRecipient());
+//                helper.setText(templateMessage,true);
+//                helper.setSubject(emailDetail.getSubject());
+//                File file = new File("C:/Users/raclo/OneDrive/Documents/Amritya_Resume.pdf");
+//
+//                        helper.addAttachment("Amritya Ranga Resume.pdf",file);
+//                javaMailSender.send(mimeMessage);
+//                return templateMessage;
+//            }
 }

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.test.annotation.Timed;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,22 +21,22 @@ public class EmailSenderController {
 
     @Autowired
     public EmailSendService emailService;
-
-    @PostMapping("/sendMail")
-    public String
-    sendMail(@RequestBody EmailDetail details)
-    {
-        String status
-                = emailService.sendSimpleMail(details);
-
-        return status;
-    }
-
-    @PostMapping("/sendMailWithAttachment")
-    public ResponseEntity<?> sendMailWithAttachment(@RequestBody EmailDetail details){
-        String status = emailService.senMailWithAttachment(details);
-        return new ResponseEntity<>(status, HttpStatus.OK);
-    }
+//
+//    @PostMapping("/sendMail")
+//    public String
+//    sendMail(@RequestBody EmailDetail details)
+//    {
+//        String status
+//                = emailService.sendSimpleMail(details);
+//
+//        return status;
+//    }
+//
+//    @PostMapping("/sendMailWithAttachment")
+//    public ResponseEntity<?> sendMailWithAttachment(@RequestBody EmailDetail details){
+//        String status = emailService.senMailWithAttachment(details);
+//        return new ResponseEntity<>(status, HttpStatus.OK);
+//    }
 
     @GetMapping("/sendOtpToMail")
      public ResponseEntity<?> sendOtpToMail(@RequestParam String textOtp){
@@ -54,20 +55,23 @@ public class EmailSenderController {
         String status = emailService.senHtmlTemplate();
         return new ResponseEntity<>(status,HttpStatus.OK);
     }
+//
+//    @PostMapping("/sendHRMailThemeLeaf")
+//    public ResponseEntity<?> sendHRMailUsingThemeLeaf(@RequestBody EmailDetail emailDetail) throws MessagingException {
+//                String status = emailService.sendHRMailUsingThemeLeaf(emailDetail);
+//                return new ResponseEntity<>(status,HttpStatus.OK);
+//            }
+//    @Timed(value = "my_custom_metric", description = "Time taken for my custom API")
+//    @PostMapping("/sendEmailOtp")
+//    public ResponseEntity<?> sendEmailOtp(@RequestParam String receiver) throws MessagingException {
+//                return ResponseEntity.ok(emailService.sendEmailOtp(receiver));
+//            }
+//    @PostMapping("/verifyEmailOtp")
+//    public ResponseEntity<?> verifyEmailOtp(@RequestParam String otp,@RequestParam String transactionId){
+//                return ResponseEntity.ok(emailService.verifyEmailOtp(otp,transactionId));
+//            }
 
-    @PostMapping("/sendHRMailThemeLeaf")
-    public ResponseEntity<?> sendHRMailUsingThemeLeaf(@RequestBody EmailDetail emailDetail) throws MessagingException {
-                String status = emailService.sendHRMailUsingThemeLeaf(emailDetail);
-                return new ResponseEntity<>(status,HttpStatus.OK);
-            }
-    @Timed(value = "my_custom_metric", description = "Time taken for my custom API")
-    @PostMapping("/sendEmailOtp")
-    public ResponseEntity<?> sendEmailOtp(@RequestParam String receiver) throws MessagingException {
-                return ResponseEntity.ok(emailService.sendEmailOtp(receiver));
-            }
-    @PostMapping("/verifyEmailOtp")
-    public ResponseEntity<?> verifyEmailOtp(@RequestParam String otp,@RequestParam String transactionId){
-                return ResponseEntity.ok(emailService.verifyEmailOtp(otp,transactionId));
-            }
+
+
 
 }
