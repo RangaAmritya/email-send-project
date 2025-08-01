@@ -2,6 +2,9 @@ package com.learning.mongo.service;
 
 import com.learning.mongo.entity.EmailDetail;
 import jakarta.mail.MessagingException;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 //import com.learning.mongo.entity.EmilDetail;
 
 public interface EmailSendService {
@@ -14,6 +17,8 @@ public interface EmailSendService {
     String sendTemMessage();
 
     String senHtmlTemplate() throws MessagingException;
+
+    void sendEmailToRecruiter(String to, String subject, String gender, MultipartFile file) throws MessagingException, IOException;
 
 //    String sendHRMailUsingThemeLeaf(EmailDetail emailDetail) throws MessagingException;
 

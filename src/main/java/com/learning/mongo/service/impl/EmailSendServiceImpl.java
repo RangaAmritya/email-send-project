@@ -9,6 +9,7 @@ import com.learning.mongo.entity.EmailDetail;
 import com.learning.mongo.service.EmailSendService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import jakarta.activation.DataSource;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.util.ByteArrayDataSource;
@@ -20,29 +21,24 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 //import org.springframework.kafka.core.KafkaTemplate;
 //import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
+import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 //import javax.activation.DataSource;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.StringWriter;
+import java.io.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -357,4 +353,31 @@ public class EmailSendServiceImpl implements EmailSendService {
 //                javaMailSender.send(mimeMessage);
 //                return templateMessage;
 //            }
+
+
+    @Override
+    public void sendEmailToRecruiter(String to, String subject, String gender, MultipartFile file) throws MessagingException, IOException {
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage,true);
+        Map model = new HashMap<>();
+        model.put("customer","Amritya Ranga");
+        String htmlContent = mergeTemplateWithModel("DemoMail.vm",model);
+        helper.setFrom(sender);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(htmlContent);
+        helper.setSentDate(new Date());
+////        File file1 = file.getI
+//        InputStreamSource inputStreamSource = new InputStreamResource(file.getInputStream());
+//        DataInputStream dataInputStream = new DataInputStream(file.getInputStream());
+//        DataSource dataSource =
+        helper.addAttachment("Amritya Ranga Java SDE",new ByteArrayResource(file.getBytes()));
+        JavaMailSenderImpl javaMailSender1 = (JavaMailSenderImpl) javaMailSender;
+        System.out.println(javaMailSender1.getPassword()+"user : "+javaMailSender1.getUsername());
+        javaMailSender.send(mimeMessage);
+
+
+    }
+
+
 }
