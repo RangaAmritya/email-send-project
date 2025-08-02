@@ -274,11 +274,18 @@ public class EmailSendServiceImpl implements EmailSendService {
     }
 
     private String mergeTemplateWithModel(String templateName, Map model) {
-        VelocityContext velocityContext = new VelocityContext(model);
         VelocityEngine velocityEngine = new VelocityEngine();
-        StringWriter stringWriter = new StringWriter();
-        velocityEngine.mergeTemplate("src/main/resources/templates/" + templateName,"UTF-8", velocityContext, stringWriter);
-        return stringWriter.toString();
+        velocityEngine.setProperty("resource.loader", "class");
+        velocityEngine.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+        velocityEngine.init();
+
+        VelocityContext context = new VelocityContext(model);
+        StringWriter writer = new StringWriter();
+
+        // Use classpath-relative path only
+        velocityEngine.mergeTemplate("templates/" + templateName, "UTF-8", context, writer);
+
+        return writer.toString();
     }
 
 //    @Override
