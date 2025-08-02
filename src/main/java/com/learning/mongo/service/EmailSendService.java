@@ -18,7 +18,7 @@ public interface EmailSendService {
 
     String senHtmlTemplate() throws MessagingException;
 
-    void sendEmailToRecruiter(String to, String subject, String gender, MultipartFile file) throws MessagingException, IOException;
+    void sendEmailToRecruiter(String jobTitle,String sendName,String to, String subject, String gender, MultipartFile file) throws MessagingException, IOException;
 
 //    String sendHRMailUsingThemeLeaf(EmailDetail emailDetail) throws MessagingException;
 

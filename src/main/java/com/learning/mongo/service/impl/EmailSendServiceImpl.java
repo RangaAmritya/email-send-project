@@ -363,22 +363,19 @@ public class EmailSendServiceImpl implements EmailSendService {
 
 
     @Override
-    public void sendEmailToRecruiter(String to, String subject, String gender, MultipartFile file) throws MessagingException, IOException {
+    public void sendEmailToRecruiter(String jobTitle,String senderName,String to, String subject, String gender, MultipartFile file) throws MessagingException, IOException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage,true);
-        Map model = new HashMap<>();
-        model.put("customer","Amritya Ranga");
+        Map<String,String> model = new HashMap<>();
+        model.put("hrName",senderName);
+        model.put("jobTitle",jobTitle);
         String htmlContent = mergeTemplateWithModel("DemoMail.vm",model);
         helper.setFrom(sender);
         helper.setTo(to);
         helper.setSubject(subject);
         helper.setText(htmlContent);
         helper.setSentDate(new Date());
-////        File file1 = file.getI
-//        InputStreamSource inputStreamSource = new InputStreamResource(file.getInputStream());
-//        DataInputStream dataInputStream = new DataInputStream(file.getInputStream());
-//        DataSource dataSource =
-        helper.addAttachment("Amritya Ranga Java SDE",new ByteArrayResource(file.getBytes()));
+        helper.addAttachment("Amritya Ranga Java SDE.pdf",new ByteArrayResource(file.getBytes()));
         JavaMailSenderImpl javaMailSender1 = (JavaMailSenderImpl) javaMailSender;
         System.out.println(javaMailSender1.getPassword()+"user : "+javaMailSender1.getUsername());
         javaMailSender.send(mimeMessage);

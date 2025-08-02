@@ -29,13 +29,15 @@ public class EmailController {
 
 
     @PostMapping("/send-email")
-    public String sendEmail(@RequestParam String to,
+    public String sendEmail(@RequestParam(required = false) String jobTitle,
+                            @RequestParam (required = false)String senderName,
+                            @RequestParam String to,
                             @RequestParam String subject,
                             @RequestParam(required = false) String gender,
                             @RequestParam(value = "file",required = false) MultipartFile file,
                             Model model) throws MessagingException, IOException {
 
-        emailSendService.sendEmailToRecruiter(to,subject,gender,file);
+        emailSendService.sendEmailToRecruiter(jobTitle,senderName,to,subject,gender,file);
 
         String msg = "Email sent successfully to " + to + " (" + gender + ")";
         System.out.println(msg);
