@@ -29,7 +29,23 @@ public class EmailController {
 
 
     @PostMapping("/send-email")
-    public String sendEmail(@RequestParam(required = false) String jobTitle,
+    public String sendEmail(@RequestParam(required = false) String title,
+                            @RequestParam (required = false)String senderName,
+                            @RequestParam String to,
+                            @RequestParam String subject,
+                            @RequestParam(required = false) String gender,
+                            Model model) throws MessagingException, IOException {
+
+        emailSendService.sendEmailTest(title,senderName,to,subject,gender);
+
+        String msg = "Email sent successfully to " + to + " (" + gender + ")";
+        System.out.println(msg);
+        model.addAttribute("message", msg);
+        return "email_form";
+    }
+
+    @PostMapping("/send-email2")
+    public String sendEmail2(@RequestParam(required = false) String title,
                             @RequestParam (required = false)String senderName,
                             @RequestParam String to,
                             @RequestParam String subject,
@@ -37,7 +53,7 @@ public class EmailController {
                             @RequestParam(value = "file",required = false) MultipartFile file,
                             Model model) throws MessagingException, IOException {
 
-        emailSendService.sendEmailToRecruiter(jobTitle,senderName,to,subject,gender,file);
+        emailSendService.sendEmail(title,senderName,to,subject,gender,file);
 
         String msg = "Email sent successfully to " + to + " (" + gender + ")";
         System.out.println(msg);

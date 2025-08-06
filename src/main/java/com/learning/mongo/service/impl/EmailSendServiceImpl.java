@@ -363,11 +363,11 @@ public class EmailSendServiceImpl implements EmailSendService {
 
 
     @Override
-    public void sendEmailToRecruiter(String jobTitle,String senderName,String to, String subject, String gender, MultipartFile file) throws MessagingException, IOException {
+    public void sendEmail(String jobTitle,String senderName,String to, String subject, String gender, MultipartFile file) throws MessagingException, IOException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage,true);
         Map<String,String> model = new HashMap<>();
-        model.put("hrName",senderName);
+        model.put("Name",senderName);
         model.put("jobTitle",jobTitle);
         String htmlContent = mergeTemplateWithModel("DemoMail.vm",model);
         helper.setFrom(sender);
@@ -380,6 +380,24 @@ public class EmailSendServiceImpl implements EmailSendService {
         System.out.println(javaMailSender1.getPassword()+"user : "+javaMailSender1.getUsername());
         javaMailSender.send(mimeMessage);
 
+    }
+
+    @Override
+    public void sendEmailTest(String jobTitle,String senderName,String to, String subject, String gender) throws MessagingException, IOException {
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage,true);
+        Map<String,String> model = new HashMap<>();
+        model.put("Name",senderName);
+        model.put("Title",jobTitle);
+        String htmlContent = mergeTemplateWithModel("DemoMail2.vm",model);
+        helper.setFrom(sender);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(htmlContent);
+        helper.setSentDate(new Date());
+        JavaMailSenderImpl javaMailSender1 = (JavaMailSenderImpl) javaMailSender;
+        System.out.println(javaMailSender1.getPassword()+"user : "+javaMailSender1.getUsername());
+        javaMailSender.send(mimeMessage);
 
     }
 

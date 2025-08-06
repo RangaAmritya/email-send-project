@@ -1,0 +1,4 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1754463456008,5699,email-send,200,,Thread Group 1-1,text,true,,3076,136390,3,3,http://localhost:8081/send-email,5696,0,17
+1754463456299,5471,email-send,200,,Thread Group 1-2,text,true,,3076,136380,2,2,http://localhost:8081/send-email,5470,0,1
+1754463456631,5337,email-send,200,,Thread Group 1-3,text,true,,3076,136400,1,1,http://localhost:8081/send-email,5337,0,1

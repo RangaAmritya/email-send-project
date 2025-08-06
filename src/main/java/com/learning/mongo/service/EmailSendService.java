@@ -18,11 +18,14 @@ public interface EmailSendService {
 
     String senHtmlTemplate() throws MessagingException;
 
-    void sendEmailToRecruiter(String jobTitle,String sendName,String to, String subject, String gender, MultipartFile file) throws MessagingException, IOException;
+    void sendEmail(String jobTitle,String sendName,String to, String subject, String gender, MultipartFile file) throws MessagingException, IOException;
 
 //    String sendHRMailUsingThemeLeaf(EmailDetail emailDetail) throws MessagingException;
 
 //    Object sendEmailOtp(String receiver) throws MessagingException;
 
 //    String verifyEmailOtp(String otp, String transactionId);
+
+    void sendEmailTest(String jobTitle,String sendName,String to, String subject, String gender) throws MessagingException, IOException;
+
 }
